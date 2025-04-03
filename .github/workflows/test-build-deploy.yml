@@ -18,6 +18,21 @@ jobs:
         exit-code: '1'
         ignore-unfixed: true
         severity: 'CRITICAL,HIGH'
+  cdk-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - run: npm ci
+        working-directory: ./cdk
+      - run: npm run build --if-present
+        working-directory: ./cdk
+      - run: npm test
+        working-directory: ./cdk
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -30,13 +45,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
       - run: npm ci
-        working-directory: lambda
+        working-directory: ./lambda
       - run: npm run build --if-present
-        working-directory: lambda
+        working-directory: ./lambda
       - run: npm test
-        working-directory: lambda
+        working-directory: ./lambda
   build:
     runs-on: ubuntu-latest
     needs:
@@ -49,7 +63,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: 'npm'
       - run: npm ci
         working-directory: ./lambda
       - run: npm run build --if-present
@@ -81,7 +94,12 @@ jobs:
         with:
           name: lambda_function
           path: lambda_function.zip
+      - run: npm ci
+        working-directory: ./cdk
+      - run: npm run build --if-present
+        working-directory: ./cdk
       - name: deploy lambda code
+        working-directory: ./cdk
         run: |
           npx cdk deploy "DemoAppStack-${DEPLOY_ENV}-${DEPLOY_REGION}"\
             --require-approval never \
