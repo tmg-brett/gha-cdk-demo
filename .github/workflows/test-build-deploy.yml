@@ -27,6 +27,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
+      - name: create dummy lambda zip
+        run: touch lambda_function.zip
       - run: npm ci
         working-directory: ./cdk
       - run: npm run build --if-present
