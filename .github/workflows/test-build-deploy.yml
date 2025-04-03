@@ -1,4 +1,4 @@
-name: test application code
+name: test, build, and deploy application code
 
 on: push
 
@@ -96,7 +96,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::855363317312:role/github-actions-role
-          aws-region: ${DEPLOY_REGION}
+          aws-region: ${{ env.DEPLOY_REGION }}
       - uses: actions/download-artifact@v4
         with:
           name: lambda_function
