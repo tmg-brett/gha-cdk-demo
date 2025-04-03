@@ -1,0 +1,88 @@
+name: test application code
+
+on: push
+
+jobs:
+  trivy-test:
+    name: Trivy Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Run Trivy vulnerability scanner in fs mode
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        severity: 'CRITICAL,HIGH'
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+        working-directory: ./lambda
+      - run: npm run build --if-present
+        working-directory: ./lambda
+      - run: npm test
+        working-directory: ./lambda
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+      - trivy-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+      - run: npm ci
+        working-directory: ./lambda
+      - run: npm run build --if-present
+        working-directory: ./lambda
+      - name: build lambda zip
+        working-directory: ./lambda
+        run: |
+          zip -r "../lambda_function.zip" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lambda_function
+          path: lambda_function.zip
+  deploy-sandbox:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      DEPLOY_ENV: sandbox
+      DEPLOY_REGION: us-east-1
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: deploy to aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - uses: actions/download-artifact@v4
+        with:
+          name: lambda_function
+          path: lambda_function.zip
+      - name: deploy lambda code
+        run: |
+          npx cdk deploy "DemoAppStack-${DEPLOY_ENV}-${DEPLOY_REGION}"\
+            --require-approval never \
+            --ci
