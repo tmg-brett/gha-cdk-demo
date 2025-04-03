@@ -32,11 +32,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci
-        working-directory: ./lambda
+        working-directory: lambda
       - run: npm run build --if-present
-        working-directory: ./lambda
+        working-directory: lambda
       - run: npm test
-        working-directory: ./lambda
+        working-directory: lambda
   build:
     runs-on: ubuntu-latest
     needs:
