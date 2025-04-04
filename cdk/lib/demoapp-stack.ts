@@ -10,7 +10,7 @@ export class DemoAppStack extends cdk.Stack {
     const lambdaRuntime = lambda.Runtime.NODEJS_22_X;
     const lambdaFunction = new lambda.Function(this, 'HelloHandler', {
       runtime: lambdaRuntime,
-      code: lambda.Code.fromAsset(`../lambda_function.zip`),
+      code: lambda.Code.fromAsset('../lambda'),
       handler: 'index.handler',
       environment: {
         MY_ENV_VAR: 'Hello from Lambda!',
