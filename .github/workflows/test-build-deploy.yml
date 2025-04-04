@@ -110,6 +110,6 @@ jobs:
       - name: deploy lambda code
         working-directory: ./cdk
         run: |
-          npx cdk deploy "DemoAppStack-${DEPLOY_ENV}-${DEPLOY_REGION}"\
+          cdk deploy "DemoAppStack-${DEPLOY_ENV}-${DEPLOY_REGION}" \
             --require-approval never \
             --ci

@@ -8,6 +8,6 @@ const produse1 = { account: '123456789012', region: 'us-east-1' }
 
 const app = new cdk.App();
 
-new DemoAppStack(app, 'DemoAppStack-sandbox-us-east-1', 'sandbox', { env: sandboxuse2 });
+new DemoAppStack(app, 'DemoAppStack-sandbox-us-east-2', 'sandbox', { env: sandboxuse2 });
 new DemoAppStack(app, 'DemoAppStack-stage-us-east-1', 'staging', { env: stageuse1 });
 new DemoAppStack(app, 'DemoAppStack-prod-us-east-1', 'prod', { env: produse1 });
