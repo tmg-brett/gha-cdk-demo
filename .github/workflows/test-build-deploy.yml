@@ -95,7 +95,7 @@ jobs:
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::855363317312:role/github-actions-role
+          role-to-assume: arn:aws:iam::855363317312:role/github-actions-trust-Role-UylPDdo2zxtX
           aws-region: ${{ env.DEPLOY_REGION }}
       - uses: actions/download-artifact@v4
         with:
