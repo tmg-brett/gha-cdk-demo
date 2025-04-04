@@ -15,10 +15,13 @@ export class DemoAppStack extends cdk.Stack {
       environment: {
         MY_ENV_VAR: 'Hello from Lambda!',
       },
+      currentVersionOptions: {
+        removalPolicy: cdk.RemovalPolicy.RETAIN,
+      },
     });
     const version = lambdaFunction.currentVersion;
     const alias = new lambda.Alias(this, 'LambdaAlias', {
-      aliasName: environment,
+      aliasName: environment, // branch name for dev envs
       version,
     });
     new codedeploy.LambdaDeploymentGroup(this, 'DeploymentGroup', {
