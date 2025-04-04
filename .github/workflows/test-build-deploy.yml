@@ -103,6 +103,7 @@ jobs:
         with:
           name: lambda_function
           path: lambda_function.zip
+      - run: npm i -g aws-cdk
       - run: npm ci
         working-directory: ./cdk
       - run: npm run build --if-present
